@@ -1,0 +1,8 @@
+_appinfo/
+mock/*.html
+mount.log
+state.json
+verification.png
+scripts/injector.lock
+__pycache__/
+node_modules/

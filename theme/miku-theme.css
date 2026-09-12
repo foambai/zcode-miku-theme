@@ -1,0 +1,502 @@
+/* ============================================================
+   ZCode · 初音未来主题 (Hatsune Miku Theme for ZCode Desktop)
+   夜间形态: 深海夜航 × 荧光葱绿   日间形态: 薄荷白 × 深青
+   原理: 覆盖 ZCode 设计令牌 (Tailwind v4 CSS variables)
+   版式注入后生效; 卸载即恢复原样, 不修改任何程序文件。
+   ============================================================ */
+
+/* ---------- 基础调色板: 把 sky 色阶整体染成 Miku 葱绿 ---------- */
+:root, :host {
+  --color-sky-50:  #EAFBF9;
+  --color-sky-100: #D2F6F1;
+  --color-sky-200: #A5EDE5;
+  --color-sky-300: #70E1D7;
+  --color-sky-400: #4FD5CA;
+  --color-sky-500: #39C5BB;
+  --color-sky-600: #22A79E;
+  --color-sky-700: #16857F;
+  --color-sky-900: #0E5753;
+  --color-sky-950: #0A3F3D;
+}
+
+/* 中性灰整体带一点青色倾向, 让未覆盖的角落也有"海风"氛围 */
+:root, :host {
+  --color-neutral-50:  oklch(98.5% 0.006 190);
+  --color-neutral-100: oklch(96.8% 0.008 192);
+  --color-neutral-200: oklch(92%   0.010 194);
+  --color-neutral-300: oklch(86.5% 0.012 198);
+  --color-neutral-400: oklch(70.5% 0.014 202);
+  --color-neutral-500: oklch(55.5% 0.014 205);
+  --color-neutral-700: oklch(37%   0.016 210);
+  --color-neutral-800: oklch(27%   0.016 212);
+  --color-neutral-900: oklch(21%   0.016 214);
+  --color-neutral-950: oklch(15.5% 0.014 216);
+  --color-zinc-100: var(--color-neutral-100);
+  --color-zinc-300: var(--color-neutral-300);
+  --color-zinc-400: var(--color-neutral-400);
+  --color-zinc-500: var(--color-neutral-500);
+  --color-zinc-800: var(--color-neutral-800);
+  --color-zinc-950: var(--color-neutral-950);
+  --color-gray-100: var(--color-neutral-100);
+  --color-gray-400: var(--color-neutral-400);
+  --color-gray-700: var(--color-neutral-700);
+  --color-gray-900: var(--color-neutral-900);
+  --color-slate-50:  var(--color-neutral-50);
+  --color-slate-200: var(--color-neutral-200);
+  --color-slate-300: var(--color-neutral-300);
+  --color-slate-500: var(--color-neutral-500);
+  --color-slate-600: var(--color-neutral-500);
+  --color-slate-700: var(--color-neutral-700);
+  --color-slate-900: var(--color-neutral-900);
+}
+
+/* ============================================================
+   夜间形态 (dark / zai-dark)
+   ============================================================ */
+.dark, .zai-dark, .theme-zai-dark,
+:root.dark, :root.zai-dark, :root.theme-zai-dark {
+  --animated-gradient-text-strong: #DFFAF6;
+  --animated-gradient-text-soft: #39C5BB59;
+
+  --color-background: #0B141B;
+  --color-background-alt: #13202999;
+  --color-background-win-alt: #13222B;
+
+  --color-sidebar: #091017;
+  --color-panel: #0D1821;
+  --color-header: #0B141B;
+
+  --color-card: #0F1C25;
+  --color-card-border: var(--color-border);
+  --color-card-selected: #12333A;
+
+  --color-surface: #39C5BB12;
+  --color-surface-hover: #39C5BB1F;
+  --color-hover: var(--color-surface-hover);
+  --color-selected: #39C5BB2E;
+
+  --color-accent: #0C2E33;
+
+  --color-foreground: #E7F6F4;
+  --color-foreground-subtle: #9CCBC5;
+  --color-foreground-subtlest: #6FA19B;
+  --color-foreground-inverse: #071016;
+
+  --color-border: #39C5BB26;
+  --color-border-hover: #39C5BB47;
+
+  --color-brand: #39C5BB;
+  --color-primary: #39C5BB;
+  --color-primary-foreground: #05201C;
+  --color-secondary: #12333A;
+
+  --color-input: #0E1B24;
+  --color-input-focused: #122733;
+  --color-input-border: #39C5BB2E;
+  --color-input-border-hover: #39C5BB52;
+  --color-input-border-focused: #39C5BB;
+
+  --color-popover: #0F1D26;
+  --color-popover-foreground: #E7F6F4;
+  --color-popover-border: #39C5BB26;
+  --color-popover-header: #122430;
+
+  --color-menu: #0F1D26;
+  --color-menu-hover: #16333B;
+
+  --color-tab: #0B141B;
+  --color-tab-active: #13242E;
+  --color-tab-border: #39C5BB26;
+
+  --color-tag: #10333A;
+  --color-markdown-inline-code: var(--color-tag);
+
+  --color-tooltip: #123037;
+  --color-tooltip-foreground: #E7F6F4;
+  --color-tooltip-tag: #0A4A44;
+  --color-tooltip-tag-foreground: #CFF5F0;
+
+  --color-toast: #102732;
+
+  --color-find-highlight: #0F5A52;
+  --color-find-highlight-active: #17857E;
+
+  --color-trajectory-user: #6EC8FF;
+  --color-trajectory-assistant: #39C5BB;
+  --color-trajectory-reasoning: #B79CFF;
+  --color-trajectory-tool-call: #FFC978;
+  --color-trajectory-tool-result: #66E3D6;
+
+  --color-idle-task: #7FB9B2;
+  --color-idle-task-surface: #12262C;
+
+  /* 终端配色: 夜航灯塔 */
+  --color-terminal-bg: #081018;
+  --color-terminal-fg: #D9EFEC;
+  --color-terminal-cursor: #39C5BB;
+  --color-terminal-cursor-accent: #06131A;
+  --color-terminal-selection: #39C5BB59;
+  --color-terminal-selection-inactive: #39C5BB2E;
+  --color-terminal-black: #1B2C36;
+  --color-terminal-red: #FF7A85;
+  --color-terminal-green: #7EE0A3;
+  --color-terminal-yellow: #FFD37E;
+  --color-terminal-blue: #6CB6FF;
+  --color-terminal-magenta: #FF8ED1;
+  --color-terminal-cyan: #39C5BB;
+  --color-terminal-white: #E7F6F4;
+  --color-terminal-bright-black: #33505C;
+  --color-terminal-bright-red: #FFA3AB;
+  --color-terminal-bright-green: #A5EDC1;
+  --color-terminal-bright-yellow: #FFE4A8;
+  --color-terminal-bright-blue: #9ACDFF;
+  --color-terminal-bright-magenta: #FFB5E2;
+  --color-terminal-bright-cyan: #7FF0E8;
+  --color-terminal-bright-white: #FFFFFF;
+
+  /* diff / git 状态 */
+  --color-diff-added: #0E3B31;
+  --color-diff-added-foreground: #7EE0A3;
+  --color-diff-removed: #3B1720;
+  --color-diff-removed-foreground: #FF9AA5;
+  --color-git-added: #7EE0A3;
+  --color-git-deleted: #FF8B95;
+  --color-git-modified: #FFD37E;
+  --color-git-renamed: #6EC8FF;
+  --color-git-untracked: #B79CFF;
+  --color-git-ignored: #5F8B85;
+  --color-git-descendant: #8AB8D8;
+  --color-git-none: #4C6B75;
+
+  /* 统计图表: 葱绿 × 樱粉 */
+  --color-usage-chart-1: #39C5BB;
+  --color-usage-chart-2: #FF7EB6;
+  --color-usage-chart-3: #7FD4E8;
+  --color-usage-chart-4: #B79CFF;
+  --color-usage-chart-5: #FFE08A;
+  --color-usage-chart-6: #66E3D6;
+  --color-usage-heatmap-0: #12242C;
+  --color-usage-heatmap-1: #1E5A58;
+  --color-usage-heatmap-2: #227E75;
+  --color-usage-heatmap-3: #2BA396;
+  --color-usage-heatmap-4: #39C5BB;
+  --color-context-breakdown-1: #39C5BB;
+  --color-context-breakdown-2: #FF7EB6;
+  --color-context-breakdown-3: #7FD4E8;
+  --color-context-breakdown-4: #B79CFF;
+  --color-context-breakdown-5: #FFE08A;
+  --color-context-breakdown-6: #7EE0A3;
+  --color-context-breakdown-7: #FFA98F;
+
+  /* 树节点 */
+  --color-command-node: #14313A;
+  --color-command-node-hover: #1B4550;
+  --color-command-node-foreground: #CFEFEA;
+  --color-file-node: #14313A;
+  --color-file-node-hover: #1B4550;
+  --color-file-node-foreground: #CFEFEA;
+  --color-plugin-node: #14313A;
+  --color-plugin-node-hover: #1B4550;
+  --color-plugin-node-foreground: #CFEFEA;
+  --color-session-node: #14313A;
+  --color-session-node-hover: #1B4550;
+  --color-session-node-foreground: #CFEFEA;
+  --color-skill-node: #14313A;
+  --color-skill-node-hover: #1B4550;
+  --color-skill-node-foreground: #CFEFEA;
+  --color-subagent-node: #14313A;
+  --color-subagent-node-hover: #1B4550;
+  --color-subagent-node-foreground: #CFEFEA;
+
+  --color-icon-blue: #6EC8FF;
+
+  --color-success: #7EE0A3;
+  --color-success-foreground: #062017;
+  --color-warning: #FFD37E;
+  --color-warning-foreground: #2A1D02;
+  --color-destructive: #FF7A85;
+  --color-destructive-foreground: #2A0508;
+}
+
+/* ============================================================
+   日间形态 (light)
+   ============================================================ */
+:root:not(.dark):not(.zai-dark):not(.theme-zai-dark):not(.zai-dark):not(.theme-zai-dark),
+.zai-light, .theme-zai-light,
+:root.zai-light, :root.theme-zai-light {
+  --animated-gradient-text-strong: #0A2E2A;
+  --animated-gradient-text-soft: #0CA79B38;
+
+  --color-background: #F3FAF9;
+  --color-background-alt: #FFFFFFCC;
+  --color-background-win-alt: #E7F3F1;
+
+  --color-sidebar: #E9F5F3;
+  --color-panel: #F7FCFB;
+  --color-header: #F3FAF9;
+
+  --color-card: #FFFFFF;
+  --color-card-border: var(--color-border);
+  --color-card-selected: #DCF2EE;
+
+  --color-surface: #39C5BB14;
+  --color-surface-hover: #39C5BB21;
+  --color-hover: var(--color-surface-hover);
+  --color-selected: #39C5BB30;
+
+  --color-accent: #DDF4F0;
+
+  --color-foreground: #16333A;
+  --color-foreground-subtle: #4A7076;
+  --color-foreground-subtlest: #7C9EA1;
+  --color-foreground-inverse: #FFFFFF;
+
+  --color-border: #C4E2DE;
+  --color-border-hover: #9ED4CD;
+
+  --color-brand: #0CA79B;
+  --color-primary: #0CA79B;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #DCF2EE;
+
+  --color-input: #FFFFFF;
+  --color-input-focused: #F4FCFA;
+  --color-input-border: #C4E2DE;
+  --color-input-border-hover: #9ED4CD;
+  --color-input-border-focused: #0CA79B;
+
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #16333A;
+  --color-popover-border: #C4E2DE;
+  --color-popover-header: #EFF9F7;
+
+  --color-menu: #FFFFFF;
+  --color-menu-hover: #E4F5F2;
+
+  --color-tab: #F3FAF9;
+  --color-tab-active: #FFFFFF;
+  --color-tab-border: #C4E2DE;
+
+  --color-tag: #E3F4F1;
+  --color-markdown-inline-code: var(--color-tag);
+
+  --color-tooltip: #123A40;
+  --color-tooltip-foreground: #EAF9F7;
+  --color-tooltip-tag: #0CA79B;
+  --color-tooltip-tag-foreground: #FFFFFF;
+
+  --color-toast: #FFFFFF;
+
+  --color-find-highlight: #BFF0E9;
+  --color-find-highlight-active: #8FE0D6;
+
+  --color-trajectory-user: #2563EB;
+  --color-trajectory-assistant: #0CA79B;
+  --color-trajectory-reasoning: #7C3AED;
+  --color-trajectory-tool-call: #D97706;
+  --color-trajectory-tool-result: #0284C7;
+
+  --color-idle-task: #3E8E86;
+  --color-idle-task-surface: #E4F3F1;
+
+  /* 终端配色: 白昼信风 */
+  --color-terminal-bg: #FBFEFE;
+  --color-terminal-fg: #16333A;
+  --color-terminal-cursor: #0CA79B;
+  --color-terminal-cursor-accent: #FBFEFE;
+  --color-terminal-selection: #39C5BB52;
+  --color-terminal-selection-inactive: #39C5BB2E;
+  --color-terminal-black: #2A3F46;
+  --color-terminal-red: #D64550;
+  --color-terminal-green: #1F9D64;
+  --color-terminal-yellow: #B7791F;
+  --color-terminal-blue: #2B6CB0;
+  --color-terminal-magenta: #C0438F;
+  --color-terminal-cyan: #0CA79B;
+  --color-terminal-white: #DCEBE9;
+  --color-terminal-bright-black: #52676E;
+  --color-terminal-bright-red: #E86E77;
+  --color-terminal-bright-green: #35B87F;
+  --color-terminal-bright-yellow: #D99A2B;
+  --color-terminal-bright-blue: #4C8FE0;
+  --color-terminal-bright-magenta: #D96BAB;
+  --color-terminal-bright-cyan: #21B7AC;
+  --color-terminal-bright-white: #F0F7F6;
+
+  --color-diff-added: #DFF5EA;
+  --color-diff-added-foreground: #17724A;
+  --color-diff-removed: #FCE4E7;
+  --color-diff-removed-foreground: #B3383F;
+  --color-git-added: #1F9D64;
+  --color-git-deleted: #D64550;
+  --color-git-modified: #B7791F;
+  --color-git-renamed: #2B6CB0;
+  --color-git-untracked: #7C3AED;
+  --color-git-ignored: #8FA8A5;
+  --color-git-descendant: #4A7076;
+  --color-git-none: #A9C3C0;
+
+  --color-usage-chart-1: #0CA79B;
+  --color-usage-chart-2: #E86FA8;
+  --color-usage-chart-3: #4C8FE0;
+  --color-usage-chart-4: #8B6CE8;
+  --color-usage-chart-5: #D99A2B;
+  --color-usage-chart-6: #35B87F;
+  --color-usage-heatmap-0: #E3F1EF;
+  --color-usage-heatmap-1: #BFE8E2;
+  --color-usage-heatmap-2: #8AD9CF;
+  --color-usage-heatmap-3: #4FC2B6;
+  --color-usage-heatmap-4: #0CA79B;
+  --color-context-breakdown-1: #0CA79B;
+  --color-context-breakdown-2: #E86FA8;
+  --color-context-breakdown-3: #4C8FE0;
+  --color-context-breakdown-4: #8B6CE8;
+  --color-context-breakdown-5: #D99A2B;
+  --color-context-breakdown-6: #35B87F;
+  --color-context-breakdown-7: #5AA9B8;
+
+  --color-command-node: #EDF7F5;
+  --color-command-node-hover: #DCF0EC;
+  --color-command-node-foreground: #2A4A50;
+  --color-file-node: #EDF7F5;
+  --color-file-node-hover: #DCF0EC;
+  --color-file-node-foreground: #2A4A50;
+  --color-plugin-node: #EDF7F5;
+  --color-plugin-node-hover: #DCF0EC;
+  --color-plugin-node-foreground: #2A4A50;
+  --color-session-node: #EDF7F5;
+  --color-session-node-hover: #DCF0EC;
+  --color-session-node-foreground: #2A4A50;
+  --color-skill-node: #EDF7F5;
+  --color-skill-node-hover: #DCF0EC;
+  --color-skill-node-foreground: #2A4A50;
+  --color-subagent-node: #EDF7F5;
+  --color-subagent-node-hover: #DCF0EC;
+  --color-subagent-node-foreground: #2A4A50;
+
+  --color-icon-blue: #2B6CB0;
+
+  --color-success: #1F9D64;
+  --color-success-foreground: #FFFFFF;
+  --color-warning: #B7791F;
+  --color-warning-foreground: #FFFFFF;
+  --color-destructive: #D64550;
+  --color-destructive-foreground: #FFFFFF;
+}
+
+/* ============================================================
+   装饰层: 立绘 / 呼吸光效 / 音符 (不响应鼠标)
+   ============================================================ */
+#zcode-miku-layer {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#zcode-miku-layer .miku-aura {
+  position: absolute;
+  right: calc(1.2vw + 10vh);
+  bottom: -8vh;
+  width: 52vh;
+  height: 52vh;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(57, 197, 187, 0.26) 0%,
+    rgba(57, 197, 187, 0.10) 45%,
+    transparent 70%);
+  filter: blur(8px);
+  animation: miku-glow 5.6s ease-in-out infinite alternate;
+}
+
+#zcode-miku-layer .miku-img {
+  position: absolute;
+  right: 1.2vw;
+  bottom: 0;
+  height: clamp(240px, 38vh, 430px);
+  max-width: none; /* 装饰层是 0 宽容器, 抵消 Tailwind preflight 的 img{max-width:100%} */
+  width: auto;
+  filter: drop-shadow(0 10px 28px rgba(8, 36, 40, 0.45));
+  animation: miku-breathe 4.8s ease-in-out infinite alternate;
+  transform-origin: 50% 100%;
+}
+
+:root:not(.dark):not(.zai-dark):not(.theme-zai-dark) #zcode-miku-layer .miku-img,
+.zai-light #zcode-miku-layer .miku-img,
+.theme-zai-light #zcode-miku-layer .miku-img {
+  opacity: 0.92;
+}
+
+#zcode-miku-layer .miku-note {
+  position: absolute;
+  bottom: 44vh;
+  color: var(--color-brand);
+  opacity: 0;
+  font-size: 18px;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(57, 197, 187, 0.65);
+  animation: miku-note 9s linear infinite;
+}
+#zcode-miku-layer .miku-note:nth-of-type(1) { right: 26vw; animation-duration: 8.2s;  animation-delay: 0s;   font-size: 15px; }
+#zcode-miku-layer .miku-note:nth-of-type(2) { right: 18vw; animation-duration: 10.4s; animation-delay: 2.1s; font-size: 20px; }
+#zcode-miku-layer .miku-note:nth-of-type(3) { right: 31vw; animation-duration: 9.1s;  animation-delay: 4.4s; font-size: 16px; }
+#zcode-miku-layer .miku-note:nth-of-type(4) { right: 13vw; animation-duration: 11.2s; animation-delay: 1.2s; font-size: 14px; }
+#zcode-miku-layer .miku-note:nth-of-type(5) { right: 22vw; animation-duration: 9.8s;  animation-delay: 6.3s; font-size: 18px; }
+#zcode-miku-layer .miku-note:nth-of-type(6) { right: 34vw; animation-duration: 10.8s; animation-delay: 7.6s; font-size: 14px; }
+
+@keyframes miku-breathe {
+  from { transform: scale(1) translateY(0); }
+  to   { transform: scale(1.013) translateY(-5px); }
+}
+@keyframes miku-glow {
+  from { opacity: 0.55; transform: scale(0.96); }
+  to   { opacity: 0.95; transform: scale(1.06); }
+}
+@keyframes miku-note {
+  0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+  8%   { opacity: 0.9; }
+  55%  { opacity: 0.5; }
+  100% { opacity: 0; transform: translateY(-160px) rotate(16deg); }
+}
+
+/* hover fade: cursor over the figure -> fade out (JS toggles .miku-hover via
+   document-level mousemove + per-pixel alpha hit test; clicks always pass through) */
+#zcode-miku-layer .miku-img,
+#zcode-miku-layer .miku-aura {
+  transition: opacity 0.25s ease;
+}
+#zcode-miku-layer.miku-hover .miku-img  { opacity: 0.1  !important; }
+#zcode-miku-layer.miku-hover .miku-aura { opacity: 0.15 !important; }
+#zcode-miku-layer.miku-hover .miku-note { animation: none !important; opacity: 0 !important; }
+
+@media (max-width: 1020px), (max-height: 620px) {
+  #zcode-miku-layer { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #zcode-miku-layer .miku-img,
+  #zcode-miku-layer .miku-aura,
+  #zcode-miku-layer .miku-note { animation: none; }
+}
+
+/* ============================================================
+   细节打磨
+   ============================================================ */
+.dark ::selection, .zai-dark ::selection, .theme-zai-dark ::selection {
+  background: #39C5BB47;
+}
+:root:not(.dark):not(.zai-dark):not(.theme-zai-dark) ::selection,
+.zai-light ::selection, .theme-zai-light ::selection {
+  background: #39C5BB59;
+}
+
+input, textarea {
+  caret-color: var(--color-brand);
+}
+
+* {
+  scrollbar-color: var(--color-border-hover) transparent;
+  scrollbar-width: thin;
+}
