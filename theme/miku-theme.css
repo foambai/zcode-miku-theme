@@ -58,24 +58,25 @@
   --animated-gradient-text-strong: #DFFAF6;
   --animated-gradient-text-soft: #39C5BB59;
 
-  --color-background: #0B141B;
-  --color-background-alt: #13202999;
-  --color-background-win-alt: #13222B;
+  /* 表面加透明度: 让背景透出来 */
+  --color-background: #0B141B59;
+  --color-background-alt: #13202966;
+  --color-background-win-alt: #13222BC0;
 
-  --color-sidebar: #091017;
-  --color-panel: #0D1821;
-  --color-header: #0B141B;
+  --color-sidebar: #091017CC;
+  --color-panel: #0D182199;
+  --color-header: #0B141BD0;
 
-  --color-card: #0F1C25;
+  --color-card: #0F1C258C;
   --color-card-border: var(--color-border);
-  --color-card-selected: #12333A;
+  --color-card-selected: #12333AE0;
 
   --color-surface: #39C5BB12;
   --color-surface-hover: #39C5BB1F;
   --color-hover: var(--color-surface-hover);
   --color-selected: #39C5BB2E;
 
-  --color-accent: #0C2E33;
+  --color-accent: #0C2E33D9;
 
   --color-foreground: #E7F6F4;
   --color-foreground-subtle: #9CCBC5;
@@ -90,8 +91,8 @@
   --color-primary-foreground: #05201C;
   --color-secondary: #12333A;
 
-  --color-input: #0E1B24;
-  --color-input-focused: #122733;
+  --color-input: #0E1B24D9;
+  --color-input-focused: #122733E0;
   --color-input-border: #39C5BB2E;
   --color-input-border-hover: #39C5BB52;
   --color-input-border-focused: #39C5BB;
@@ -227,24 +228,25 @@
   --animated-gradient-text-strong: #0A2E2A;
   --animated-gradient-text-soft: #0CA79B38;
 
-  --color-background: #F3FAF9;
-  --color-background-alt: #FFFFFFCC;
-  --color-background-win-alt: #E7F3F1;
+  /* 表面加透明度: 背景以浅色玻璃形式透出 */
+  --color-background: #F3FAF9BF;
+  --color-background-alt: #FFFFFFB3;
+  --color-background-win-alt: #E7F3F1CC;
 
-  --color-sidebar: #E9F5F3;
-  --color-panel: #F7FCFB;
-  --color-header: #F3FAF9;
+  --color-sidebar: #E9F5F3D9;
+  --color-panel: #F7FCFBC7;
+  --color-header: #F3FAF9BF;
 
-  --color-card: #FFFFFF;
+  --color-card: #FFFFFFB3;
   --color-card-border: var(--color-border);
-  --color-card-selected: #DCF2EE;
+  --color-card-selected: #DCF2EEE6;
 
   --color-surface: #39C5BB14;
   --color-surface-hover: #39C5BB21;
   --color-hover: var(--color-surface-hover);
   --color-selected: #39C5BB30;
 
-  --color-accent: #DDF4F0;
+  --color-accent: #DDF4F0D9;
 
   --color-foreground: #16333A;
   --color-foreground-subtle: #4A7076;
@@ -480,6 +482,184 @@
   #zcode-miku-layer .miku-aura,
   #zcode-miku-layer .miku-note { animation: none; }
 }
+
+/* ============================================================
+   像素画背景层（仅夜间形态显示）
+   原图为清晰像素画；任务页面虚化+压暗，新建任务页面清晰展示。
+   注入器每 0.8s 检测页面状态并切换 html.miku-welcome 类。
+   ============================================================ */
+#zcode-miku-bg {
+  display: block !important; /* 压制历史样式表里遗留的 display:none */
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+/* 日间形态: 背景提亮 + 半透明, 成淡淡的水色剪影, 不干扰深色文字 */
+html:not(.dark):not(.zai-dark):not(.theme-zai-dark) #zcode-miku-bg {
+  filter: brightness(1.45) saturate(0.95);
+  opacity: 0.42;
+}
+html { background: #EDF6F5; }
+html.dark, html.zai-dark, html.theme-zai-dark { background: #0B141B; }
+#zcode-miku-bg img {
+  position: absolute;
+  inset: -24px;
+  width: calc(100% + 48px);
+  height: calc(100% + 48px);
+  object-fit: cover;
+  filter: blur(2px) brightness(1.15) saturate(1.2);
+  transition: filter 0.35s ease;
+}
+html.miku-welcome #zcode-miku-bg img {
+  filter: brightness(1.2);
+}
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================================
+   背景设置面板（♪ 按钮 + 图库/虚化/亮度）
+   ============================================================ */
+#miku-ctl {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2147483000;
+  font-size: 12px;
+  color: #E7F6F4;
+}
+#miku-ctl-gear {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(57, 197, 187, 0.45);
+  background: rgba(9, 16, 23, 0.72);
+  color: #39C5BB;
+  cursor: pointer;
+  font-size: 15px;
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+}
+#miku-ctl-gear:hover { opacity: 1; transform: scale(1.1); }
+#miku-ctl-panel {
+  display: none;
+  position: absolute;
+  right: 0;
+  bottom: 40px;
+  width: 236px;
+  background: rgba(9, 16, 23, 0.94);
+  border: 1px solid rgba(57, 197, 187, 0.35);
+  border-radius: 12px;
+  padding: 10px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.55);
+}
+#miku-ctl-panel.open { display: block; }
+.miku-ctl-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #9CCBC5;
+}
+.miku-ctl-switch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 400;
+  font-size: 11px;
+  color: #E7F6F4;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+.miku-ctl-switch input { accent-color: #39C5BB; cursor: pointer; }
+html.miku-bg-off #zcode-miku-bg { display: none !important; }
+#miku-ctl-mode {
+  font-size: 11px;
+  font-weight: 400;
+  color: #39C5BB;
+  border: 1px solid rgba(57, 197, 187, 0.4);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+#miku-ctl-imgs {
+  max-height: 136px;
+  overflow: auto;
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+#miku-ctl-pick {
+  display: block;
+  width: 100%;
+  background: rgba(57, 197, 187, 0.14);
+  border: 1px dashed rgba(57, 197, 187, 0.55);
+  color: #9CCBC5;
+  border-radius: 8px;
+  padding: 6px 0;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s, color 0.2s;
+}
+#miku-ctl-pick:hover { background: rgba(57, 197, 187, 0.26); color: #E7F6F4; }
+.miku-ctl-img { position: relative; }
+.miku-ctl-img .del {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9CCBC5;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.miku-ctl-img:hover .del { opacity: 1; }
+.miku-ctl-img .del:hover { color: #FF7A85; }
+.miku-ctl-img {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.miku-ctl-img:hover { background: rgba(57, 197, 187, 0.12); }
+.miku-ctl-img.active { border-color: rgba(57, 197, 187, 0.55); background: rgba(57, 197, 187, 0.1); }
+.miku-ctl-img .thumb {
+  width: 46px;
+  height: 28px;
+  border-radius: 5px;
+  background-size: cover;
+  background-position: center;
+  flex: none;
+}
+.miku-ctl-img span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.miku-ctl-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+.miku-ctl-row span:first-child { width: 30px; color: #9CCBC5; flex: none; }
+.miku-ctl-row span:last-child { width: 42px; text-align: right; color: #9CCBC5; flex: none; }
+.miku-ctl-row input[type="range"] { flex: 1; accent-color: #39C5BB; }
+.miku-ctl-foot { text-align: right; margin-top: 6px; }
+#miku-ctl-reset {
+  background: transparent;
+  border: 1px solid rgba(57, 197, 187, 0.4);
+  color: #9CCBC5;
+  border-radius: 8px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-size: 11px;
+}
+#miku-ctl-reset:hover { color: #39C5BB; border-color: #39C5BB; }
 
 /* ============================================================
    细节打磨

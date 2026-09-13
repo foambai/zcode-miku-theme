@@ -6,3 +6,5 @@ verification.png
 scripts/injector.lock
 __pycache__/
 node_modules/
+backgrounds/
+assets/pixel-bg-preview.png

@@ -18,6 +18,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CSS_PATH = path.join(__dirname, '..', 'theme', 'miku-theme.css');
 const IMG_PATH = path.join(__dirname, '..', 'assets', 'miku-v4x.png');
+const BG_PATH = path.join(__dirname, '..', 'assets', 'pixel-bg.png');
 const LOCK_PATH = path.join(__dirname, 'injector.lock');
 
 const args = process.argv.slice(2);
@@ -33,6 +34,24 @@ if (!PORT) { console.error('[miku] missing --port'); process.exit(2); }
 
 const cssText = fs.readFileSync(CSS_PATH, 'utf8');
 const imgDataUri = 'data:image/png;base64,' + fs.readFileSync(IMG_PATH).toString('base64');
+
+/* background library: every image in backgrounds/ becomes switchable in the panel */
+const BG_DIR = path.join(__dirname, '..', 'backgrounds');
+fs.mkdirSync(BG_DIR, { recursive: true });
+const BG_MIME = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
+const bgList = fs.readdirSync(BG_DIR)
+  .map(name => ({ name, ext: path.extname(name).toLowerCase() }))
+  .filter(e => BG_MIME[e.ext])
+  .map(e => {
+    const p = path.join(BG_DIR, e.name);
+    const size = fs.statSync(p).size;
+    return { name: e.name, ext: e.ext, p, size };
+  })
+  .filter(e => e.size > 0 && e.size <= 8 * 1024 * 1024)
+  .sort((a, b) => a.name.localeCompare(b.name, 'zh'))
+  .map(e => ({ name: e.name, src: 'data:' + BG_MIME[e.ext] + ';base64,' + fs.readFileSync(e.p).toString('base64') }));
+if (!bgList.length && fs.existsSync(BG_PATH)) bgList.push({ name: '默认背景', src: 'data:image/jpeg;base64,' + fs.readFileSync(BG_PATH).toString('base64') });
+const PANEL_SRC = fs.readFileSync(path.join(__dirname, 'panel.js'), 'utf8');
 
 const BASE = `http://127.0.0.1:${PORT}`;
 let seq = 1;
@@ -97,9 +116,17 @@ function connect(wsUrl) {
   });
 }
 
-/* decoration layer DOM (idempotent) + hover-fade hit testing */
+/* background layer + control panel + decoration layer (idempotent) */
 const LAYER_JS = `
 (function(){
+  if (!document.getElementById('zcode-miku-bg')) {
+    const bg = document.createElement('div');
+    bg.id = 'zcode-miku-bg';
+    bg.innerHTML = '<img alt="" draggable="false">';
+    (document.body || document.documentElement).appendChild(bg);
+  }
+  window.__MIKU_BGS = ${JSON.stringify(bgList)};
+  ${PANEL_SRC}
   const img = ${JSON.stringify(imgDataUri)};
   let layer = document.getElementById('zcode-miku-layer');
   if (!layer) {
@@ -114,6 +141,25 @@ const LAYER_JS = `
   const im = layer.querySelector('.miku-img');
   if (im && !im.src.startsWith('data:')) im.src = img;
   document.documentElement.setAttribute('data-miku-mounted', '1');
+  if (!document.__mikuStateWatch) {
+    document.__mikuStateWatch = true;
+    let lastMode = null;
+    setInterval(function(){
+      try {
+        const welcome = !!Array.prototype.find.call(
+          document.querySelectorAll('button'),
+          function(b){ return b.offsetParent && b.innerText.indexOf('\u9009\u62E9\u9879\u76EE') >= 0; }
+        );
+        document.documentElement.classList.toggle('miku-welcome', welcome);
+        const m = welcome ? 'welcome' : 'task';
+        if (m !== lastMode) {
+          lastMode = m;
+          if (window.__mikuApply) window.__mikuApply();
+          if (window.__mikuRefreshUI) window.__mikuRefreshUI();
+        }
+      } catch (e) {}
+    }, 800);
+  }
   if (!document.__mikuHoverBound) {
     document.__mikuHoverBound = true;
     document.addEventListener('mousemove', function(e){
@@ -144,19 +190,27 @@ const LAYER_JS = `
 async function injectInto(target) {
   const ws = await connect(target.webSocketDebuggerUrl);
   try {
-    // 1) CDP stylesheet (not subject to page CSP)
+    // 1) CDP stylesheet (not subject to page CSP); reuse the same sheet on re-inject
     let sheetOk = false;
     try {
       await ws.send('Page.enable');
       await ws.send('DOM.enable');
       await ws.send('CSS.enable');
-      const ft = await ws.send('Page.getFrameTree');
-      const frameId = ft.frameTree.frame.id;
-      const { styleSheetId } = await ws.send('CSS.createStyleSheet', { frameId });
-      await ws.send('CSS.setStyleSheetText', { styleSheetId, text: cssText });
-      sheetOk = true;
+      const st = await ws.send('Runtime.evaluate', { expression: 'window.__mikuSheetId||""', returnByValue: true });
+      const prevId = st.result?.value;
+      if (prevId) {
+        await ws.send('CSS.setStyleSheetText', { styleSheetId: prevId, text: cssText });
+        sheetOk = true;
+      } else {
+        const ft = await ws.send('Page.getFrameTree');
+        const frameId = ft.frameTree.frame.id;
+        const { styleSheetId } = await ws.send('CSS.createStyleSheet', { frameId });
+        await ws.send('CSS.setStyleSheetText', { styleSheetId, text: cssText });
+        await ws.send('Runtime.evaluate', { expression: 'window.__mikuSheetId = ' + JSON.stringify(styleSheetId), returnByValue: true });
+        sheetOk = true;
+      }
     } catch (e) {
-      console.error('[miku] CSS.createStyleSheet failed, fallback to <style>: ', e.message);
+      console.error('[miku] CSS stylesheet injection failed, fallback to <style>: ', e.message);
     }
     // 2) fallback <style> + decoration layer
     const r = await ws.send('Runtime.evaluate', {
