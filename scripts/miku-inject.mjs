@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CSS_PATH = path.join(__dirname, '..', 'theme', 'miku-theme.css');
 const IMG_PATH = path.join(__dirname, '..', 'assets', 'miku-v4x.png');
-const BG_PATH = path.join(__dirname, '..', 'assets', 'pixel-bg.png');
+const BG_PATH = path.join(__dirname, '..', 'assets', 'pixel-bg.jpg');
 const LOCK_PATH = path.join(__dirname, 'injector.lock');
 
 const args = process.argv.slice(2);

@@ -1,6 +1,6 @@
 # ZCode 初音未来主题 (Hatsune Miku Skin for ZCode)
 
-非官方、非商业的粉丝二创主题。通过 Chromium 调试端口（仅 127.0.0.1 回环 + 固定端口 39517）向 ZCode 桌面端注入 CSS，实现日夜双形态换肤 + **像素画/自定义背景**（♪ 面板可换图/调虚化/调亮度/总开关）+ 初音未来立绘 + 呼吸光效 + 悬停淡出 + 音符动效。**不修改任何程序文件，卸载即恢复原版。**
+非官方、非商业的粉丝二创主题。通过 Chromium 调试端口（仅 127.0.0.1 回环 + 固定端口 39517）向 ZCode 桌面端注入 CSS，实现日夜双形态换肤 + **雨夜城市背景**（♪ 面板可换图/调虚化/调亮度/总开关）+ 初音未来立绘 + 呼吸光效 + 悬停淡出 + 音符动效。**不修改任何程序文件，卸载即恢复原版。**
 
 - 适配版本：本机 ZCode 3.11.2.6792（Electron 41）实测可用；其它版本未验证
 - 主题仓库目录：`C:\Users\Lenovo\.zcode\workspace\default\miku-theme\`
@@ -37,7 +37,8 @@ miku-theme/
 ├─ scripts/check-state.mjs      查看当前注入状态
 ├─ scripts/gen-pixel-bg.mjs     自制像素画生成器（默认背景来源，可自由分发）
 ├─ backgrounds/                 你的背景图库（gitignore，不入仓库）：丢进任何 jpg/png/webp（<8MB）即出现在 ♪ 面板里
-├─ assets/pixel-bg.png          默认背景：自制像素风 Miku 房间（仓库自带，可自由分发）
+├─ assets/pixel-bg.jpg          默认背景：雨夜城市窗边的初音场景
+├─ assets/pixel-bg.png          备用背景：自制像素风 Miku 房间（gen-pixel-bg.mjs 生成，可自由分发）
 ├─ assets/miku-v4x.png          初音未来立绘（官方画师 iXima 绘制的 V4X 立绘，透明底，来自萌娘百科）
 ├─ mock/dark.html · light.html  本地预览页（用真实样式表模拟界面，可双击打开看效果）
 └─ mount.log / state.json / verification.png / scripts/injector.lock   运行时产物（gitignore）
@@ -45,7 +46,7 @@ miku-theme/
 
 ## 背景图与设置面板
 
-日间和夜间模式都会显示背景，风格自动切换：夜间是像素画的深色虚化薄纱（brightness 1.15）；日间做"浅色玻璃"处理（提亮 + 32% 不透明度的水色剪影），深色文字不受影响。按页面自动切换形态：
+日间和夜间模式都会显示背景，风格自动切换：夜间是雨夜城市的深色虚化薄纱（brightness 1.15）；日间做"浅色玻璃"处理（提亮 + 32% 不透明度的水色剪影），深色文字不受影响。按页面自动切换形态：
 
 - **新建任务首页**：背景清晰展示（无虚化）；
 - **任务/对话等其它页面**：背景虚化，保证工作区文字可读；
@@ -57,7 +58,7 @@ miku-theme/
 - 图库列表：`backgrounds/` 文件夹里的图片 + 你选过的自定义图，点击切换；
 - **虚化 / 亮度滑条**：实时预览；任务页和首页的参数**分别记忆**（存 localStorage），重启应用后自动恢复。
 
-默认背景是**自制像素风 Miku 房间**（`scripts/gen-pixel-bg.mjs` 生成，随仓库自由分发）。想用自己的图：直接用 ♪ 面板的"从电脑选择图片"（仅保存在本地 localStorage，不会进入仓库），或把图片放进 `backgrounds/` 文件夹（该文件夹已被 gitignore，请勿将版权图提交到仓库）。想调虚化/明暗：用面板滑条，或改 `theme/miku-theme.css` 里 `#zcode-miku-bg img` 的 filter 两行。
+默认背景是**雨夜城市窗边的初音场景**（项目自带）。想用自己的图：直接用 ♪ 面板的"从电脑选择图片"（仅保存在本地 localStorage，不会进入仓库），或把图片放进 `backgrounds/` 文件夹（该文件夹已被 gitignore，请勿将版权图提交到仓库）。想调虚化/明暗：用面板滑条，或改 `theme/miku-theme.css` 里 `#zcode-miku-bg img` 的 filter 两行。
 
 ## 工作原理与安全边界
 
