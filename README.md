@@ -27,7 +27,7 @@ miku-theme/
 ├─ mount.cmd / mount.ps1        挂载入口（关应用→带调试端口重启→注入→验证截图）
 ├─ mount-hidden.vbs             静默挂载入口（无窗口，供计划任务/脚本调用）
 ├─ unmount.cmd / unmount.ps1    卸载入口（停注入器→重启应用→恢复原版）
-├─ setup-autostart.ps1          配置免操作自启（改快捷方式参数 + 启动文件夹自启）
+├─ setup-autostart.ps1          配置免操作自启（改快捷方式参数 + 启动文件夹自启 + 看门狗）
 ├─ teardown-autostart.ps1       移除免操作自启（还原快捷方式、删自启、停注入器）
 ├─ theme/miku-theme.css         主题本体（覆盖 ZCode 的 --color-* 设计令牌，265 个变量体系）
 ├─ scripts/miku-inject.mjs      CDP 注入器（--forever 监督模式常驻巡检；单实例锁）
@@ -69,11 +69,12 @@ miku-theme/
 
 ## 已知限制
 
-- 主题依赖启动参数里的调试端口：**必须通过带参数的快捷方式启动**才会自动挂载。若从其它入口启动（如协议唤起、别的启动器），主题不会出现，此时双击 `mount.cmd` 补救即可。
+- **自愈看门狗**：监督进程带 `--watchdog` 运行。若 ZCode 被外部以无端口方式启动/重启（例如应用自带更新器更新完成后自动重启），看门狗会在约 20 秒内检测到并自动以挂载模式重启应用——**应用更新后主题会自动回来**，无需手动干预（当前已在 3.11.2 → 3.12.3 升级中验证）。
+- 若不希望看门狗自动重启应用，把启动文件夹里 `zcode-miku-watch.vbs` 中的 `--watchdog` 参数删掉即可（注入功能不受影响，只是失去自愈能力）。
 - 卸载自启用 `teardown-autostart.ps1`；`unmount.cmd` 只恢复当前会话。
 - 强制关闭应用使用 `taskkill`，不会丢失会话数据（任务与对话持久化在磁盘），但仍建议先保存正在编辑的文件。
 - 挂载期间调试端口（仅 127.0.0.1 回环、固定 39517）允许本机进程读取页面内容；彻底移除请用 `teardown-autostart.ps1`。
-- ZCode 应用更新后令牌名或界面结构可能变化，主题或需重新适配；样式异常时先 `teardown-autostart.ps1` + `unmount.cmd` 恢复。
+- ZCode 大版本更新后若令牌名或界面结构变化，主题可能需要重新适配（看门狗只负责"挂上"，不负责"适配"）；样式异常时先 `teardown-autostart.ps1` + `unmount.cmd` 恢复。
 
 ## 致谢与声明
 

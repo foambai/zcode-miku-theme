@@ -14,6 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CSS_PATH = path.join(__dirname, '..', 'theme', 'miku-theme.css');
@@ -34,6 +35,56 @@ if (!PORT) { console.error('[miku] missing --port'); process.exit(2); }
 
 const cssText = fs.readFileSync(CSS_PATH, 'utf8');
 const imgDataUri = 'data:image/png;base64,' + fs.readFileSync(IMG_PATH).toString('base64');
+
+/* watchdog (supervisor only): if ZCode is running WITHOUT the debug port
+ * (e.g. relaunched bare by the app's own updater), remount it. */
+const ZCODE_EXE = ['D:\\Program Files\\ZCode\\ZCode.exe',
+  process.env.LOCALAPPDATA + '\\Programs\\ZCode\\ZCode.exe',
+  process.env.ProgramFiles + '\\ZCode\\ZCode.exe',
+  'C:\\Program Files\\ZCode\\ZCode.exe',
+].find(p => { try { return fs.existsSync(p); } catch { return false; } }) || 'ZCode.exe';
+const WATCHDOG = FOREVER && (args.includes('--watchdog') || process.env.MIKU_WATCHDOG === '1');
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function zcodeRunning() {
+  try {
+    return /ZCode\.exe/i.test(execSync('tasklist /FI "IMAGENAME eq ZCode.exe" /NH', { stdio: 'pipe' }).toString());
+  } catch { return false; }
+}
+async function cdpUp(timeoutMs = 1500) {
+  try { await fetch(`${BASE}/json/version`, { signal: AbortSignal.timeout(timeoutMs) }); return true; }
+  catch { return false; }
+}
+async function waitCdp(timeoutMs) {
+  const t0 = Date.now();
+  while (Date.now() - t0 < timeoutMs) { if (await cdpUp(1000)) return true; }
+  return false;
+}
+async function watchdogLoop() {
+  console.log('[miku] watchdog armed: bare ZCode launches will be remounted');
+  let graceUntil = Date.now() + 20000;   // let the app settle after injector start
+  for (;;) {
+    await sleep(5000);
+    try {
+      if (!zcodeRunning()) { graceUntil = Date.now() + 20000; continue; }
+      if (Date.now() < graceUntil) continue;
+      if (await cdpUp()) continue;
+      console.log('[miku] watchdog: ZCode running without port, remounting...');
+      try { execSync('taskkill /F /IM ZCode.exe /T', { stdio: 'ignore' }); } catch { /* ignore */ }
+      await sleep(2500);
+      const { spawn: sp } = await import('node:child_process');
+      sp(ZCODE_EXE, ['--remote-debugging-port=' + PORT, '--remote-allow-origins=*'], { detached: true, stdio: 'ignore' }).unref();
+      const ok = await waitCdp(45000);
+      console.log('[miku] watchdog: remount ' + (ok ? 'ok' : 'FAILED'));
+      if (!ok) {
+        try { sp(ZCODE_EXE, [], { detached: true, stdio: 'ignore' }).unref(); } catch { /* ignore */ }
+      }
+      graceUntil = Date.now() + 25000;
+    } catch (e) {
+      console.error('[miku] watchdog error:', e.message);
+    }
+  }
+}
 
 /* background library: every image in backgrounds/ becomes switchable in the panel */
 const BG_DIR = path.join(__dirname, '..', 'backgrounds');
@@ -294,9 +345,7 @@ async function cycle() {
 (async () => {
   if (FOREVER) {
     console.log('[miku] supervisor mode: watching port ' + PORT);
-    for (;;) {
-      try { await fetch(`${BASE}/json/version`); break; } catch { await new Promise(r => setTimeout(r, 2000)); }
-    }
+    if (WATCHDOG) watchdogLoop();   // async loop, runs alongside the cycle
     await cycle();
     setInterval(() => cycle().catch(e => console.error('[miku] cycle:', e.message)), 3000);
     return;
